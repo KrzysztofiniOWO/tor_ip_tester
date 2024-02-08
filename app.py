@@ -1,29 +1,24 @@
-import subprocess
 import requests
 import time
-import os
-
-# Pełna ścieżka do pliku tor.exe
-TOR_EXE_PATH = r'D:\\Tor\\tor\\tor.exe'
+import socket
+import socks
+from stem import Signal
+from stem.control import Controller
 
 # Adres SOCKS proxy dla lokalnej instancji Tor
 TOR_SOCKS_PORT = 9050
+TOR_CONTROL_PORT = 9051
 
-# Ścieżka do pliku kontrolnego, który jest używany do autoryzacji
-CONTROL_AUTH_COOKIE_PATH = r'D:\\Tor\\tor\\data\\control_auth_cookie'
-
-# Funkcja do zmiany adresu IP przez zrestartowanie procesu Tor
-def change_tor_ip():
-    stop_tor()
-    start_tor()
-
-# Funkcja do uruchamiania Tor
-def start_tor():
-    subprocess.run([TOR_EXE_PATH, "--quiet", "--hash-password", "", "--controlport", str(TOR_SOCKS_PORT)])
-
-# Funkcja do zatrzymywania Tor
-def stop_tor():
-    subprocess.run([TOR_EXE_PATH, "--quiet", "--hash-password", "", "--controlport", str(TOR_SOCKS_PORT), "--pidfile", "kill"])
+# Funkcja do zmiany adresu IP przez bezpośredni SOCKS proxy
+def change_tor_circuit():
+    try:
+        with Controller.from_port(port=TOR_CONTROL_PORT) as controller:
+            controller.authenticate()  # Uwierzytelnianie przy użyciu kontroli Tor
+            controller.signal(Signal.NEWNYM)  # Wysyłanie sygnału do zmiany obwodu
+            print("New Tor circuit created.")
+    except Exception as e:
+        print(f"Error: {e}")
+        print("Unable to change Tor circuit.")
 
 # Funkcja do wykonania zapytania HTTP przez Tor
 def make_tor_request(url, max_content_lines=10):
@@ -32,42 +27,53 @@ def make_tor_request(url, max_content_lines=10):
                        'https': f'socks5h://localhost:{TOR_SOCKS_PORT}'}
 
     try:
-        response = session.get(url, timeout=5)
-        print(f"Status Code: {response.status_code}")
+        start_time = time.time()
+        response = session.get(url, timeout=10)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
 
-        # Wyświetl tylko kilka pierwszych linii odpowiedzi
-        content_lines = response.text.split('\n')[:max_content_lines]
-        content_preview = '\n'.join(content_lines)
-        print(f"Content Preview:\n{content_preview}")
+        print(f"Status Code: {response.status_code}")
+        print(f"Elapsed Time: {elapsed_time:.2f}")
+
+        try:
+            local_ip = session.get("http://httpbin.org/ip").json()["origin"]
+            peer_ip = response.raw._fp.fp.raw._sock.getpeername()[0]
+            print(f"Local IP Address: {local_ip}")
+            print(f"Peer IP Address: {peer_ip}")
+        except AttributeError:
+            print("Unable to retrieve IP Address.")
+
+        # Wyłączono wydruk treści odpowiedzi
+        # content_lines = response.text.split('\n')[:max_content_lines]
+        # content_preview = '\n'.join(content_lines)
+        # print(f"Content Preview:\n{content_preview}")
+
+        with open('results.txt', 'a') as file:
+            file.write(f"Success - Status Code: {response.status_code}, Elapsed Time: {elapsed_time:.2f}, Local IP Address: {local_ip if 'local_ip' in locals() else 'N/A'}, Peer IP Address: {peer_ip if 'peer_ip' in locals() else 'N/A'}, URL: {url}\n")
+
+    except requests.exceptions.Timeout:
+        print("Error: Connection timed out.")
+
+        with open('results.txt', 'a') as file:
+            file.write(f"Failure - Error: Connection timed out, URL: {url}\n")
+
     except Exception as e:
         print(f"Error: {e}")
+
+        with open('results.txt', 'a') as file:
+            file.write(f"Failure - Error: {e}, URL: {url}\n")
+
     finally:
         session.close()
 
 # Przykładowe użycie
 if __name__ == "__main__":
     try:
-        # Uruchom proces Tor w tle
-        start_tor()
+        num_iterations = int(input("Podaj liczbę iteracji (zmian adresu IP): "))
+        for _ in range(num_iterations):
+            change_tor_circuit()
+            time.sleep(5)
+            make_tor_request("https://www.nytimesn7cgmftshazwhfgzm37qxb44r64ytbb2dj3x62d2lljsciiyd.onion/")
 
-        # Poczekaj chwilę przed zapytaniem
-        time.sleep(5)
-
-        # Zapytanie HTTP przez Tor
-        make_tor_request("https://www.nytimesn7cgmftshazwhfgzm37qxb44r64ytbb2dj3x62d2lljsciiyd.onion/")
-
-        # Poczekaj przed zmianą adresu IP
-        time.sleep(5)
-
-        # Zmiana adresu IP
-        change_tor_ip()
-
-        # Poczekaj przed kolejnym zapytaniem
-        time.sleep(5)
-
-        # Zapytanie po zmianie adresu IP
-        make_tor_request("https://www.nytimesn7cgmftshazwhfgzm37qxb44r64ytbb2dj3x62d2lljsciiyd.onion/")
-
-    finally:
-        # Zatrzymaj Tor po zakończeniu
-        stop_tor()
+    except KeyboardInterrupt:
+        pass

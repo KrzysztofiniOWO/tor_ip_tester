@@ -7,8 +7,8 @@ def run_tests(webpage, amount, path):
     functions.make_tor_requests_diff_ip(webpage, amount, path)
     functions.make_tor_requests_same_ip(webpage, amount, path)
 
-    img_load_time = functions.check_first_image_load_time_diff_ip(webpage, amount, path)
-    img_load_time = functions.check_first_image_load_time_same_ip(webpage, amount, path)
+    _ = functions.check_first_image_load_time_diff_ip(webpage, amount, path)
+    _ = functions.check_first_image_load_time_same_ip(webpage, amount, path)
 
     calculations.mean_of_requests_time(f"{path}/results_diff_ip.txt")
     calculations.mean_of_requests_time(f"{path}/results_same_ip.txt")
@@ -27,8 +27,8 @@ def main():
     if not os.path.exists(args.path):
         os.makedirs(args.path)
 
-    if not os.path.exists("images"):
-        os.makedirs("images")
+    if not os.path.exists("results"):
+        os.makedirs("results")
 
     run_tests(args.webpage, args.amount, args.path)
     print(f"Succesfully ran tests for {args.webpage}")

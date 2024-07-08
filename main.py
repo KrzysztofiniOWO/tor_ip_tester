@@ -5,7 +5,7 @@ results_path = '/home/krzysztof/tor_ip_tester/results'
 downloads_path = '/home/krzysztof/tor_ip_tester/downloads'
 
 db_config = {
-    'uri': 'mongodb+srv://molakrzysztof:IFEIsvtxw0s34P7g@cluster0.x1x8qhv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',  
+    'uri': 'mongodb+srv://molakrzysztof:<pass>@cluster0.x1x8qhv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',  
     'dbname': 'inzynierka',
     'collection': 'sample_airbnb'
 }
@@ -24,3 +24,4 @@ repeats = int(input("How many requests you want to make?: "))
 
 functions.download_file_diff_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
 functions.download_file_same_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
+

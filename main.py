@@ -27,3 +27,4 @@ functions.download_file_same_ip("https://sample-videos.com/download-sample-text-
 
 functions.test_upload_file_ftp_diff_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
 functions.test_upload_file_ftp_same_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
+

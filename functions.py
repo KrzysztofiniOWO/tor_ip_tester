@@ -6,6 +6,7 @@ from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
 from stem import Signal
 from stem.control import Controller
+import ftplib
 
 proxies = {
     'http': 'socks5://127.0.0.1:9050',
@@ -106,7 +107,7 @@ def test_mongodb_diff_ip(amount, path, db_config, query):
         change_ip()
         total_time = test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
         my_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
-        result = f"{my_ip}, Query Time: {total_time}s\n"
+        result = f"{my_ip}, {total_time}\n"
         result_file_name = f"{path}/mongodb_results_diff_ip.txt"
         save_results(result, result_file_name)
 
@@ -114,7 +115,7 @@ def test_mongodb_same_ip(amount, path, db_config, query):
     for _ in range(amount):
         total_time = test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
         my_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
-        result = f"{my_ip}, Query Time: {total_time}s\n"
+        result = f"{my_ip}, {total_time}\n"
         result_file_name = f"{path}/mongodb_results_same_ip.txt"
         save_results(result, result_file_name)
 
@@ -178,6 +179,45 @@ def download_file_same_ip(webpage, amount, path_results, path_download):
             
         else:
             print("Download link not found")
+
+def upload_file_ftp(server, username, password, file_path):
+    try:
+        ftp = ftplib.FTP(server)
+        ftp.login(username, password)
+        with open(file_path, 'rb') as file:
+            start_time = time.time()
+            ftp.storbinary(f'STOR {file_path}', file)
+            end_time = time.time()
+        ftp.quit()
+        return end_time - start_time
+    except ftplib.all_errors as e:
+        print(f"FTP error: {e}")
+        return None
+
+def test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, path_results):
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        change_ip()
+        upload_time = upload_file_ftp(server, username, password, file_path)
+        if upload_time:
+            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+            result = f"IP Address: {my_ip}, Upload Time: {upload_time:.2f} seconds\n"
+            name = f"{path_results}/ftp_upload_diff_ip.txt"
+            save_results(result, name)
+        else:
+            print("Failed to upload file")
+
+def test_upload_file_ftp_same_ip(server, username, password, amount, file_path, path_results):
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        upload_time = upload_file_ftp(server, username, password, file_path)
+        if upload_time:
+            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+            result = f"IP Address: {my_ip}, Upload Time: {upload_time:.2f} seconds\n"
+            name = f"{path_results}/ftp_upload_same_ip.txt"
+            save_results(result, name)
+        else:
+            print("Failed to upload file")
         
 def save_results(result, name):
     with open(name, 'a') as file:

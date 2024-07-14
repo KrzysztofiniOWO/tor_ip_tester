@@ -1,6 +1,5 @@
 import time
 import requests
-import requests
 from pymongo import MongoClient
 from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
@@ -33,6 +32,19 @@ def test_mongodb_query(uri, dbname, collection_name, query):
     total_time = end_time - start_time
     client.close()
     return total_time
+
+def fetch_post(api_url):
+    try:
+        response = requests.get(api_url)
+        if response.status_code == 200:
+            json_data = response.json()
+            return json_data
+        else:
+            print(f"Failed to fetch data. Status code: {response.status_code}")
+            return None
+    except requests.RequestException as e:
+        print(f"Request failed: {e}")
+        return None
 
 def make_tor_requests_diff_ip(webpage, amount, path):
     for _ in range(amount):
@@ -218,6 +230,33 @@ def test_upload_file_ftp_same_ip(server, username, password, amount, file_path, 
             save_results(result, name)
         else:
             print("Failed to upload file")
+
+def test_jsonplaceholder_get_diff_ip(amount, path_results):
+    base_url = 'https://jsonplaceholder.typicode.com'
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        change_ip()
+        start_time = time.time()
+        json_data = fetch_post(f"{base_url}/posts/1")
+        end_time = time.time()
+        total_time = end_time - start_time
+        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+        result = f"{my_ip}, {total_time}, {json_data}\n"
+        result_file_name = f"{path_results}/jsonplaceholder_get_diff_ip.txt"
+        save_results(result, result_file_name)
+
+def test_jsonplaceholder_get_same_ip(amount, path_results):
+    base_url = 'https://jsonplaceholder.typicode.com'
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        start_time = time.time()
+        json_data = fetch_post(f"{base_url}/posts/1")
+        end_time = time.time()
+        total_time = end_time - start_time
+        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+        result = f"{my_ip}, {total_time}, {json_data}\n"
+        result_file_name = f"{path_results}/jsonplaceholder_get_same_ip.txt"
+        save_results(result, result_file_name)
         
 def save_results(result, name):
     with open(name, 'a') as file:

@@ -13,17 +13,23 @@ query = {"property_type": "house"}
 
 repeats = int(input("How many requests you want to make?: "))
 
-functions.make_tor_requests_diff_ip('https://wp.pl', repeats, results_path)
-functions.make_tor_requests_same_ip('https://wp.pl', repeats, results_path)
+# functions.make_tor_requests_diff_ip('https://wp.pl', repeats, results_path)
+# functions.make_tor_requests_same_ip('https://wp.pl', repeats, results_path)
 
-functions.check_first_image_download_time_diff_ip('https://wp.pl', repeats, results_path, downloads_path)
-functions.check_first_image_download_time_same_ip('https://wp.pl', repeats, results_path, downloads_path)
+# functions.check_first_image_download_time_diff_ip('https://wp.pl', repeats, results_path, downloads_path)
+# functions.check_first_image_download_time_same_ip('https://wp.pl', repeats, results_path, downloads_path)
 
-functions.test_mongodb_diff_ip(repeats, results_path, db_config, query)
-functions.test_mongodb_same_ip(repeats, results_path, db_config, query)
+# functions.test_mongodb_diff_ip(repeats, results_path, db_config, query)
+# functions.test_mongodb_same_ip(repeats, results_path, db_config, query)
 
-functions.download_file_diff_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
-functions.download_file_same_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
+# functions.download_file_diff_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
+# functions.download_file_same_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
 
-functions.test_upload_file_ftp_diff_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
-functions.test_upload_file_ftp_same_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
+# functions.test_upload_file_ftp_diff_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
+# functions.test_upload_file_ftp_same_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{downloads_path}/img_diff_ip_0.jpg', results_path)
+
+# functions.test_jsonplaceholder_get_diff_ip(repeats, results_path)
+# functions.test_jsonplaceholder_get_same_ip(repeats, results_path)
+
+functions.test_jsonplaceholder_put_diff_ip(repeats, results_path)
+functions.test_jsonplaceholder_put_same_ip(repeats, results_path)

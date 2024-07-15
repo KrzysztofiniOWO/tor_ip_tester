@@ -31,5 +31,5 @@ repeats = int(input("How many requests you want to make?: "))
 # functions.test_jsonplaceholder_get_diff_ip(repeats, results_path)
 # functions.test_jsonplaceholder_get_same_ip(repeats, results_path)
 
-functions.test_jsonplaceholder_put_diff_ip(repeats, results_path)
-functions.test_jsonplaceholder_put_same_ip(repeats, results_path)
+functions.test_dns_resolution_diff_ip("example.com", repeats, results_path)
+functions.test_dns_resolution_same_ip("example.com", repeats, results_path)

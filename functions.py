@@ -6,6 +6,7 @@ from fake_useragent import UserAgent
 from stem import Signal
 from stem.control import Controller
 import ftplib
+import dns.resolver
 
 proxies = {
     'http': 'socks5://127.0.0.1:9050',
@@ -257,6 +258,38 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
         result = f"{my_ip}, {total_time}, {json_data}\n"
         result_file_name = f"{path_results}/jsonplaceholder_get_same_ip.txt"
         save_results(result, result_file_name)
+
+def test_dns_resolution_diff_ip(domain, num_tests, path_results):
+    results = []
+    for _ in range(num_tests):
+        change_ip()
+        current_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
+        start_time = time.time()
+        resolver = dns.resolver.Resolver()
+        resolver.nameservers = ['8.8.8.8']
+        answer = resolver.query(domain)
+        end_time = time.time()
+        total_time = end_time - start_time
+        result = f"{current_ip}, {total_time} seconds, Answer: {answer[0].to_text()}\n"
+        result_file_name = f"{path_results}/dns_resolution_diff_ip_results.txt"
+        save_results(result, result_file_name)
+    return results
+
+def test_dns_resolution_same_ip(domain, num_tests, path_results):
+    results = []
+    
+    current_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
+    for _ in range(num_tests):
+        start_time = time.time()
+        resolver = dns.resolver.Resolver()
+        resolver.nameservers = ['8.8.8.8']
+        answer = resolver.query(domain)
+        end_time = time.time()
+        total_time = end_time - start_time
+        result = f"{current_ip}, {total_time} seconds, Answer: {answer[0].to_text()}\n"
+        result_file_name = f"{path_results}/dns_resolution_same_ip_results.txt"
+        save_results(result, result_file_name)
+    return results
         
 def save_results(result, name):
     with open(name, 'a') as file:

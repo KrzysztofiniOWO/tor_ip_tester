@@ -7,6 +7,8 @@ from stem import Signal
 from stem.control import Controller
 import ftplib
 import dns.resolver
+import asyncio
+import websockets
 
 proxies = {
     'http': 'socks5://127.0.0.1:9050',
@@ -46,7 +48,15 @@ def fetch_post(api_url):
     except requests.RequestException as e:
         print(f"Request failed: {e}")
         return None
-
+    
+async def websocket_test(uri):
+    async with websockets.connect(uri) as websocket:
+        start_time = time.perf_counter()
+        await websocket.send("Hello, WebSocket!")
+        response = await websocket.recv()
+        end_time = time.perf_counter()
+        return end_time - start_time, response
+    
 def make_tor_requests_diff_ip(webpage, amount, path):
     for _ in range(amount):
         headers = { 'User-Agent': UserAgent().random }
@@ -290,6 +300,26 @@ def test_dns_resolution_same_ip(domain, num_tests, path_results):
         result_file_name = f"{path_results}/dns_resolution_same_ip_results.txt"
         save_results(result, result_file_name)
     return results
+
+def test_websocket_diff_ip(uri, amount, path_results):
+    for _ in range(amount):
+        change_ip()
+        headers = {'User-Agent': UserAgent().random}
+        current_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+        
+        response_time, response = asyncio.run(websocket_test(uri))
+        result = f"{current_ip}, {response_time:.6f} seconds, Response: {response}\n"
+        result_file_name = f"{path_results}/websocket_results_diff_ip.txt"
+        save_results(result, result_file_name)
+
+def test_websocket_same_ip(uri, amount, path_results):
+    headers = {'User-Agent': UserAgent().random}
+    current_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+    for _ in range(amount):
+        response_time, response = asyncio.run(websocket_test(uri))
+        result = f"{current_ip}, {response_time:.6f} seconds, Response: {response}\n"
+        result_file_name = f"{path_results}/websocket_results_same_ip.txt"
+        save_results(result, result_file_name)
         
 def save_results(result, name):
     with open(name, 'a') as file:

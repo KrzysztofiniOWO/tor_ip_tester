@@ -57,7 +57,14 @@ async def websocket_test(uri):
         end_time = time.perf_counter()
         return end_time - start_time, response
     
-def make_tor_requests_diff_ip(webpage, amount, path):
+def get_save_data_and_save(path, additional_content, headers, total_time, filename):
+    my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+    result = f"{my_ip}, " + f"{total_time}, " + additional_content
+    result_file_name = f"{path}" + filename
+    save_results(result, result_file_name)
+
+    
+def make_tor_requests_diff_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = { 'User-Agent': UserAgent().random }
         change_ip()
@@ -65,24 +72,20 @@ def make_tor_requests_diff_ip(webpage, amount, path):
         response = make_tor_request(webpage, headers, proxies)
         end_time = time.time()
         total_time = end_time - start_time
-        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-        result = f"{my_ip}, " + f"{total_time}, " + f"{response.status_code}" + f" {webpage}\n"
-        result_file_name = f"{path}/ping_results_diff_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = f"{response.status_code}, {webpage}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/ping_results_diff_ip.txt")
 
-def make_tor_requests_same_ip(webpage, amount, path):
+def make_tor_requests_same_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         start_time = time.time()
         response = make_tor_request(webpage, headers, proxies)
         end_time = time.time()
         total_time = end_time - start_time
-        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-        result = f"{my_ip}, " + f"{total_time}, " + f"{response.status_code}" + f" {webpage}\n"
-        result_file_name = f"{path}/ping_results_same_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = f"{response.status_code}, {webpage}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/ping_results_same_ip.txt")
 
-def check_first_image_download_time_diff_ip(webpage, amount, path_result, path_download):
+def check_first_image_download_time_diff_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
         change_ip()
@@ -97,10 +100,8 @@ def check_first_image_download_time_diff_ip(webpage, amount, path_result, path_d
             save_image(response_image.content, location)
             end_time = time.time()
             total_time = end_time - start_time
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"{my_ip}, " + f"{total_time}, " + f"{response.status_code}" + f" {webpage}\n"
-            result_file_name = f"{path_result}/image_dl_results_diff_ip.txt"
-            save_results(result, result_file_name)
+            additional_content = f"{response.status_code}, {webpage}\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/image_dl_results_diff_ip.txt")
         else:
             print("Image could not be found")
 
@@ -118,29 +119,25 @@ def check_first_image_download_time_same_ip(webpage, amount, path_results, path_
             save_image(response_image.content, location)
             end_time = time.time()
             total_time = end_time - start_time
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"{my_ip}, " + f"{total_time}, " + f"{response.status_code}" + f" {webpage}\n"
-            result_file_name = f"{path_results}/image_dl_results_same_ip.txt"
-            save_results(result, result_file_name)
+            additional_content = f"{response.status_code}, {webpage}\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/image_dl_results_same_ip.txt")
         else:
             print("Image could not be found")
 
-def test_mongodb_diff_ip(amount, path, db_config, query):
+def test_mongodb_diff_ip(amount, path_results, db_config, query):
     for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
         change_ip()
         total_time = test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
-        my_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
-        result = f"{my_ip}, {total_time}\n"
-        result_file_name = f"{path}/mongodb_results_diff_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = "\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/mongodb_results_diff_ip.txt")
 
-def test_mongodb_same_ip(amount, path, db_config, query):
+def test_mongodb_same_ip(amount, path_results, db_config, query):
     for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
         total_time = test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
-        my_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
-        result = f"{my_ip}, {total_time}\n"
-        result_file_name = f"{path}/mongodb_results_same_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = "\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/mongodb_results_same_ip.txt")
 
 def download_file_diff_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):

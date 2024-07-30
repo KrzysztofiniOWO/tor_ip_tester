@@ -36,6 +36,21 @@ def test_mongodb_query(uri, dbname, collection_name, query):
     client.close()
     return total_time
 
+def upload_file_ftp(server, username, password, file_path):
+    try:
+        ftp = ftplib.FTP(server)
+        ftp.login(username, password)
+        with open(file_path, 'rb') as file:
+            start_time = time.time()
+            ftp.storbinary(f'STOR {file_path}', file)
+            end_time = time.time()
+        ftp.quit()
+        return end_time - start_time
+    except ftplib.all_errors as e:
+        print(f"FTP error: {e}")
+        return None
+
+
 def fetch_post(api_url):
     try:
         response = requests.get(api_url)
@@ -154,18 +169,16 @@ def download_file_diff_ip(webpage, amount, path_results, path_download):
             
             start_time = time.time()
             response_file = make_tor_request(file_url, headers, proxies)
-            end_time = time.time()
-            download_time = end_time - start_time
             
             with open(f"{path_download}/{file_name}", 'wb') as f:
                 for chunk in response_file.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
-            
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"{my_ip}, " + f"{download_time}, " + f"{response_file.status_code}" + f" {file_url}\n"
-            result_file_name = f"{path_results}/file_dl_results_diff_ip.txt"
-            save_results(result, result_file_name)
+
+            end_time = time.time()
+            total_time = end_time - start_time
+            additional_content = f"{response_file.status_code}, {file_url}\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/file_dl_results_diff_ip.txt")
             
         else:
             print("Download link not found")
@@ -184,58 +197,40 @@ def download_file_same_ip(webpage, amount, path_results, path_download):
             
             start_time = time.time()
             response_file = make_tor_request(file_url, headers, proxies)
-            end_time = time.time()
-            download_time = end_time - start_time
             
             with open(f"{path_download}/{file_name}", 'wb') as f:
                 for chunk in response_file.iter_content(chunk_size=1024):
                     if chunk:
                         f.write(chunk)
             
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"{my_ip}, " + f"{download_time}, " + f"{response_file.status_code}" + f" {file_url}\n"
-            result_file_name = f"{path_results}/file_dl_results_same_ip.txt"
-            save_results(result, result_file_name)
+            end_time = time.time()
+            total_time = end_time - start_time
+            additional_content = f"{response_file.status_code}, {file_url}\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/file_dl_results_same_ip.txt")
             
         else:
             print("Download link not found")
-
-def upload_file_ftp(server, username, password, file_path):
-    try:
-        ftp = ftplib.FTP(server)
-        ftp.login(username, password)
-        with open(file_path, 'rb') as file:
-            start_time = time.time()
-            ftp.storbinary(f'STOR {file_path}', file)
-            end_time = time.time()
-        ftp.quit()
-        return end_time - start_time
-    except ftplib.all_errors as e:
-        print(f"FTP error: {e}")
-        return None
 
 def test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         change_ip()
-        upload_time = upload_file_ftp(server, username, password, file_path)
-        if upload_time:
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"IP Address: {my_ip}, Upload Time: {upload_time:.2f} seconds\n"
-            name = f"{path_results}/ftp_upload_diff_ip.txt"
-            save_results(result, name)
+        total_time = upload_file_ftp(server, username, password, file_path)
+        if total_time:
+            additional_content = "\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_diff_ip.txt")
+
         else:
             print("Failed to upload file")
 
 def test_upload_file_ftp_same_ip(server, username, password, amount, file_path, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
-        upload_time = upload_file_ftp(server, username, password, file_path)
-        if upload_time:
-            my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-            result = f"IP Address: {my_ip}, Upload Time: {upload_time:.2f} seconds\n"
-            name = f"{path_results}/ftp_upload_same_ip.txt"
-            save_results(result, name)
+        total_time = upload_file_ftp(server, username, password, file_path)
+        if total_time:
+            additional_content = "\n"
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_same_ip.txt")
+
         else:
             print("Failed to upload file")
 
@@ -248,10 +243,8 @@ def test_jsonplaceholder_get_diff_ip(amount, path_results):
         json_data = fetch_post(f"{base_url}/posts/1")
         end_time = time.time()
         total_time = end_time - start_time
-        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-        result = f"{my_ip}, {total_time}, {json_data}\n"
-        result_file_name = f"{path_results}/jsonplaceholder_get_diff_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = f"{json_data}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_diff_ip.txt")
 
 def test_jsonplaceholder_get_same_ip(amount, path_results):
     base_url = 'https://jsonplaceholder.typicode.com'
@@ -261,31 +254,24 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
         json_data = fetch_post(f"{base_url}/posts/1")
         end_time = time.time()
         total_time = end_time - start_time
-        my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-        result = f"{my_ip}, {total_time}, {json_data}\n"
-        result_file_name = f"{path_results}/jsonplaceholder_get_same_ip.txt"
-        save_results(result, result_file_name)
+        additional_content = f"{json_data}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_same_ip.txt")
 
 def test_dns_resolution_diff_ip(domain, num_tests, path_results):
-    results = []
+    headers = {'User-Agent': UserAgent().random}
     for _ in range(num_tests):
         change_ip()
-        current_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
         start_time = time.time()
         resolver = dns.resolver.Resolver()
         resolver.nameservers = ['8.8.8.8']
         answer = resolver.query(domain)
         end_time = time.time()
         total_time = end_time - start_time
-        result = f"{current_ip}, {total_time} seconds, Answer: {answer[0].to_text()}\n"
-        result_file_name = f"{path_results}/dns_resolution_diff_ip_results.txt"
-        save_results(result, result_file_name)
-    return results
+        additional_content = f"Answer: {answer[0].to_text()}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_diff_ip.txt")
 
 def test_dns_resolution_same_ip(domain, num_tests, path_results):
-    results = []
-    
-    current_ip = requests.get("http://httpbin.org/ip", proxies=proxies).json()["origin"]
+    headers = {'User-Agent': UserAgent().random}
     for _ in range(num_tests):
         start_time = time.time()
         resolver = dns.resolver.Resolver()
@@ -293,30 +279,25 @@ def test_dns_resolution_same_ip(domain, num_tests, path_results):
         answer = resolver.query(domain)
         end_time = time.time()
         total_time = end_time - start_time
-        result = f"{current_ip}, {total_time} seconds, Answer: {answer[0].to_text()}\n"
-        result_file_name = f"{path_results}/dns_resolution_same_ip_results.txt"
-        save_results(result, result_file_name)
-    return results
+        additional_content = f"Answer: {answer[0].to_text()}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_same_ip.txt")
 
 def test_websocket_diff_ip(uri, amount, path_results):
     for _ in range(amount):
         change_ip()
         headers = {'User-Agent': UserAgent().random}
-        current_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
-        
-        response_time, response = asyncio.run(websocket_test(uri))
-        result = f"{current_ip}, {response_time:.6f} seconds, Response: {response}\n"
-        result_file_name = f"{path_results}/websocket_results_diff_ip.txt"
-        save_results(result, result_file_name)
+        total_time, response = asyncio.run(websocket_test(uri))
+
+        additional_content = f"Response: {response}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_diff_ip.txt")
 
 def test_websocket_same_ip(uri, amount, path_results):
     headers = {'User-Agent': UserAgent().random}
-    current_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
     for _ in range(amount):
-        response_time, response = asyncio.run(websocket_test(uri))
-        result = f"{current_ip}, {response_time:.6f} seconds, Response: {response}\n"
-        result_file_name = f"{path_results}/websocket_results_same_ip.txt"
-        save_results(result, result_file_name)
+        total_time, response = asyncio.run(websocket_test(uri))
+
+        additional_content = f"Response: {response}\n"
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_same_ip.txt")
         
 def save_results(result, name):
     with open(name, 'a') as file:

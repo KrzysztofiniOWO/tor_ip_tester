@@ -19,8 +19,8 @@ repeats = int(input("How many requests you want to make?: "))
 # functions.check_first_image_download_time_diff_ip('https://wp.pl', repeats, results_path, downloads_path)
 # functions.check_first_image_download_time_same_ip('https://wp.pl', repeats, results_path, downloads_path)
 
-functions.test_mongodb_diff_ip(repeats, results_path, db_config, query)
-functions.test_mongodb_same_ip(repeats, results_path, db_config, query)
+# functions.test_mongodb_diff_ip(repeats, results_path, db_config, query)
+# functions.test_mongodb_same_ip(repeats, results_path, db_config, query)
 
 # functions.download_file_diff_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
 # functions.download_file_same_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)

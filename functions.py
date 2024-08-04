@@ -30,7 +30,7 @@ def save_image(image_data, location):
     with open(location, 'wb') as f:
         f.write(image_data)
     
-def make_tor_requests_diff_ip(webpage, amount, path_results):
+def make_requests_diff_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = { 'User-Agent': UserAgent().random }
         utils.change_ip()
@@ -41,7 +41,7 @@ def make_tor_requests_diff_ip(webpage, amount, path_results):
         additional_content = f"{response.status_code}, {webpage}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/ping_results_diff_ip.txt")
 
-def make_tor_requests_same_ip(webpage, amount, path_results):
+def make_requests_same_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         start_time = time.time()

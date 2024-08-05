@@ -2,12 +2,20 @@ import functions
 import calculations
 import os 
 
+def get_db_password(file_path):
+    with open (file_path, 'r') as f:
+        password = f.read().strip()
+    f.close()
+    return password
+
 results_path = '/home/krzysztof/tor_ip_tester/results'
 downloads_path = '/home/krzysztof/tor_ip_tester/downloads'
 test_data_path = '/home/krzysztof/tor_ip_tester/test_data'
 
+db_password = get_db_password('db_pass.txt')
+
 db_config = {
-    'uri': 'mongodb+srv://<pass>@cluster0.x1x8qhv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',  
+    'uri': f'mongodb+srv://{db_password}@cluster0.x1x8qhv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',  
     'dbname': 'inzynierka',
     'collection': 'sample_airbnb'
 }
@@ -18,6 +26,9 @@ if not os.path.exists("downloads"):
 
 if not os.path.exists("results"):
     os.makedirs("results")
+
+if not os.path.exists("statistics"):
+    os.makedirs("statistics")
 
 repeats = int(input("How many requests you want to make?: "))
 

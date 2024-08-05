@@ -1,11 +1,22 @@
-import statistics
+def calculate_mean_time(file_path):
+    time_values = []
 
-def mean_of_requests_time(file_name):
-    with open(file_name, 'r') as file:
-        results = file.readlines()
-        times = []
-        for result in results:
-            split_result = result.split(",")
-            times.append(round(float(split_result[1]), 3))
-        mean_ip_time = round(statistics.mean(times), 3)
-        print(mean_ip_time)
+    with open(file_path, 'r') as f:
+        for line in f:
+            parts = line.strip().split(', ')
+            if len(parts) >= 2:
+                try:
+                    time_value = float(parts[1])
+                    time_values.append(time_value)
+                except ValueError:
+                    continue
+
+    f.close()
+    if time_values:
+        mean_time = sum(time_values) / len(time_values)
+        with open(f'statistics/statistics_'+file_path, 'w') as output_file:
+            output_file.write(f"Mean time: {mean_time}\n")
+        print('kurwa')
+        return mean_time
+    else:
+        return None

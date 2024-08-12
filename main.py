@@ -8,9 +8,10 @@ def get_db_password(file_path):
     f.close()
     return password
 
-results_path = '/home/krzysztof/tor_ip_tester/results'
-downloads_path = '/home/krzysztof/tor_ip_tester/downloads'
-test_data_path = '/home/krzysztof/tor_ip_tester/test_data'
+results_path = '/results'
+downloads_path = '/downloads'
+statistics_path = '/statistics'
+test_data_path = '/test_data'
 
 db_password = get_db_password('db_pass.txt')
 
@@ -55,3 +56,5 @@ repeats = int(input("How many requests you want to make?: "))
 
 # functions.test_websocket_diff_ip("wss://echo.websocket.org", repeats, results_path)
 # functions.test_websocket_same_ip("wss://echo.websocket.org", repeats, results_path)
+
+#calculations.calculate_mean_time(f"mongodb_results_diff_ip.txt")

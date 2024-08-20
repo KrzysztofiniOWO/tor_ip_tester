@@ -8,9 +8,9 @@ def get_db_password(file_path):
     f.close()
     return password
 
-results_path = '/results'
-downloads_path = '/downloads'
-statistics_path = '/statistics'
+results_path = 'results'
+downloads_path = 'downloads'
+statistics_path = 'statistics'
 test_data_path = '/test_data'
 
 db_password = get_db_password('db_pass.txt')
@@ -33,28 +33,18 @@ if not os.path.exists("statistics"):
 
 repeats = int(input("How many requests you want to make?: "))
 
-# functions.make_requests_diff_ip('https://wp.pl', repeats, results_path)
-# functions.make_requests_same_ip('https://wp.pl', repeats, results_path)
+# functions.test_requests('https://www.wp.pl/', repeats, results_path)
 
-# functions.check_first_image_download_time_diff_ip('https://wp.pl', repeats, results_path, downloads_path)
-# functions.check_first_image_download_time_same_ip('https://wp.pl', repeats, results_path, downloads_path)
+# functions.test_images_download_time('https://store.steampowered.com/', repeats, results_path, downloads_path)
 
-# functions.test_mongodb_diff_ip(repeats, results_path, db_config, query)
-# functions.test_mongodb_same_ip(repeats, results_path, db_config, query)
+# functions.test_mongodb(repeats, results_path, db_config, query)
 
-# functions.download_file_diff_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
-# functions.download_file_same_ip("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
+# functions.test_download_file("https://sample-videos.com/download-sample-text-file.php", repeats, results_path, downloads_path)
 
-# functions.test_upload_file_ftp_diff_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{test_data_path}/sus.jpg', results_path)
-# functions.test_upload_file_ftp_same_ip('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{test_data_path}/sus.jpg', results_path)
+# functions.test_upload_file_ftp('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{test_data_path}/sus.jpg', results_path)
 
-# functions.test_jsonplaceholder_get_diff_ip(repeats, results_path)
-# functions.test_jsonplaceholder_get_same_ip(repeats, results_path)
+# functions.test_json(repeats, results_path)
 
-# functions.test_dns_resolution_diff_ip("example.com", repeats, results_path)
-# functions.test_dns_resolution_same_ip("example.com", repeats, results_path)
+# functions.test_dns_resolution("example.com", repeats, results_path)
 
-# functions.test_websocket_diff_ip("wss://echo.websocket.org", repeats, results_path)
-# functions.test_websocket_same_ip("wss://echo.websocket.org", repeats, results_path)
-
-#calculations.calculate_mean_time(f"mongodb_results_diff_ip.txt")
+# functions.test_websocket("wss://echo.websocket.org", repeats, results_path)

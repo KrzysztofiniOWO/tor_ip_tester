@@ -1,6 +1,6 @@
 import numpy as np
 
-def calculate_mean_time(file_name):
+def calculate_times(file_name):
     file_path = f"results/{file_name}"
 
     time_values = []

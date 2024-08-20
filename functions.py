@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
 import dns.resolver
 import asyncio
-
+from urllib.parse import urljoin
 import utils
 
 proxies = {
@@ -20,6 +20,7 @@ def get_save_data_and_save(path, additional_content, headers, total_time, filena
     my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
     result = f"{my_ip}, " + f"{total_time}, " + additional_content
     result_file_name = f"{path}" + filename
+    print(result_file_name)
     save_results(result, result_file_name)
 
 def save_results(result, name):
@@ -55,17 +56,29 @@ def check_first_image_download_time_diff_ip(webpage, amount, path_results, path_
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
         utils.change_ip()
+        
         response = make_tor_request(webpage, headers, proxies)
         soup = bs(response.content, 'html.parser')
-        first_image = soup.find('img')
+        first_image = None
+
+        for img in soup.find_all('img'):
+            img_url = img['src']
+            if img_url.endswith(('.jpg', '.jpeg', '.svg', '.png')):
+                first_image = img
+                break
+
         if first_image:
             start_time = time.time()
-            img_url = first_image['src']
+            img_url = urljoin(webpage, first_image['src'])
+            file_extension = img_url.split('.')[-1]  # Get the file extension
+            
             response_image = make_tor_request(img_url, headers, proxies)
-            location = f"{path_download}/img_diff_ip_{repeat}.jpg"
+            location = f"{path_download}/img_diff_ip_{repeat}.{file_extension}"
             save_image(response_image.content, location)
+            
             end_time = time.time()
             total_time = end_time - start_time
+            
             additional_content = f"{response.status_code}, {webpage}\n"
             get_save_data_and_save(path_results, additional_content, headers, total_time, "/image_dl_results_diff_ip.txt")
         else:
@@ -74,21 +87,34 @@ def check_first_image_download_time_diff_ip(webpage, amount, path_results, path_
 def check_first_image_download_time_same_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
+        
         response = make_tor_request(webpage, headers, proxies)
         soup = bs(response.content, 'html.parser')
-        first_image = soup.find('img')
+        first_image = None
+
+        for img in soup.find_all('img'):
+            img_url = img['src']
+            if img_url.endswith(('.jpg', '.jpeg', '.svg', '.png')):
+                first_image = img
+                break
+
         if first_image:
             start_time = time.time()
-            img_url = first_image['src']
+            img_url = urljoin(webpage, first_image['src'])
+            file_extension = img_url.split('.')[-1]
+            
             response_image = make_tor_request(img_url, headers, proxies)
-            location = f"{path_download}/img_same_ip_{repeat}.jpg"
+            location = f"{path_download}/img_same_ip_{repeat}.{file_extension}"
             save_image(response_image.content, location)
+            
             end_time = time.time()
             total_time = end_time - start_time
+            
             additional_content = f"{response.status_code}, {webpage}\n"
             get_save_data_and_save(path_results, additional_content, headers, total_time, "/image_dl_results_same_ip.txt")
         else:
             print("Image could not be found")
+
 
 def test_mongodb_diff_ip(amount, path_results, db_config, query):
     for _ in range(amount):
@@ -249,3 +275,35 @@ def test_websocket_same_ip(uri, amount, path_results):
 
         additional_content = f"Response: {response}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_same_ip.txt")
+
+def test_requests(webpage, amount, path_results):
+    make_requests_diff_ip(webpage, amount, path_results)
+    make_requests_same_ip(webpage, amount, path_results)
+
+def test_images_download_time(webpage, amount, path_results, path_download):
+    check_first_image_download_time_diff_ip(webpage, amount, path_results, path_download)
+    check_first_image_download_time_same_ip(webpage, amount, path_results, path_download)
+
+def test_mongodb(amount, path_results, db_config, query):
+    test_mongodb_diff_ip(amount, path_results, db_config, query)
+    test_mongodb_same_ip(amount, path_results, db_config, query)
+
+def test_download_file(webpage, amount, path_results, path_download):
+    download_file_diff_ip(webpage, amount, path_results, path_download)
+    download_file_same_ip(webpage, amount, path_results, path_download)
+
+def test_upload_file_ftp(server, username, password, amount, file_path, path_results):
+    test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, path_results)
+    test_upload_file_ftp_same_ip(server, username, password, amount, file_path, path_results)
+
+def test_json(amount, path_results):
+    test_jsonplaceholder_get_diff_ip(amount, path_results)
+    test_jsonplaceholder_get_same_ip(amount, path_results)
+
+def test_dns_resolution(domain, num_tests, path_results):
+    test_dns_resolution_diff_ip(domain, num_tests, path_results)
+    test_dns_resolution_same_ip(domain, num_tests, path_results)
+
+def test_websocket(uri, amount, path_results):
+    test_websocket_diff_ip(uri, amount, path_results)
+    test_websocket_same_ip(uri, amount, path_results)

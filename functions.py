@@ -1,3 +1,6 @@
+import utils
+import config
+
 import time
 import requests
 from bs4 import BeautifulSoup as bs
@@ -5,19 +8,13 @@ from fake_useragent import UserAgent
 import dns.resolver
 import asyncio
 from urllib.parse import urljoin
-import utils
-
-proxies = {
-    'http': 'socks5://127.0.0.1:9050',
-    'https': 'socks5://127.0.0.1:9050'
-}
 
 def make_tor_request(url, headers, proxies):
     response = requests.get(url, headers=headers, proxies=proxies)
     return response
 
 def get_save_data_and_save(path, additional_content, headers, total_time, filename):
-    my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=proxies).json()["origin"]
+    my_ip = requests.get("http://httpbin.org/ip", headers=headers, proxies=config.proxies).json()["origin"]
     result = f"{my_ip}, " + f"{total_time}, " + additional_content
     result_file_name = f"{path}" + filename
     print(result_file_name)
@@ -36,7 +33,7 @@ def make_requests_diff_ip(webpage, amount, path_results):
         headers = { 'User-Agent': UserAgent().random }
         utils.change_ip()
         start_time = time.time()
-        response = make_tor_request(webpage, headers, proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{response.status_code}, {webpage}\n"
@@ -46,7 +43,7 @@ def make_requests_same_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         start_time = time.time()
-        response = make_tor_request(webpage, headers, proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{response.status_code}, {webpage}\n"
@@ -57,7 +54,7 @@ def check_first_image_download_time_diff_ip(webpage, amount, path_results, path_
         headers = {'User-Agent': UserAgent().random}
         utils.change_ip()
         
-        response = make_tor_request(webpage, headers, proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         soup = bs(response.content, 'html.parser')
         first_image = None
 
@@ -70,9 +67,9 @@ def check_first_image_download_time_diff_ip(webpage, amount, path_results, path_
         if first_image:
             start_time = time.time()
             img_url = urljoin(webpage, first_image['src'])
-            file_extension = img_url.split('.')[-1]  # Get the file extension
+            file_extension = img_url.split('.')[-1]
             
-            response_image = make_tor_request(img_url, headers, proxies)
+            response_image = make_tor_request(img_url, headers, config.proxies)
             location = f"{path_download}/img_diff_ip_{repeat}.{file_extension}"
             save_image(response_image.content, location)
             
@@ -88,7 +85,7 @@ def check_first_image_download_time_same_ip(webpage, amount, path_results, path_
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
         
-        response = make_tor_request(webpage, headers, proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         soup = bs(response.content, 'html.parser')
         first_image = None
 
@@ -103,7 +100,7 @@ def check_first_image_download_time_same_ip(webpage, amount, path_results, path_
             img_url = urljoin(webpage, first_image['src'])
             file_extension = img_url.split('.')[-1]
             
-            response_image = make_tor_request(img_url, headers, proxies)
+            response_image = make_tor_request(img_url, headers, config.proxies)
             location = f"{path_download}/img_same_ip_{repeat}.{file_extension}"
             save_image(response_image.content, location)
             
@@ -135,7 +132,7 @@ def download_file_diff_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
         utils.change_ip()
-        response = requests.get(webpage, headers=headers, proxies=proxies)
+        response = requests.get(webpage, headers=headers, proxies=config.proxies)
         
         soup = bs(response.content, 'html.parser')
         download_link = soup.find('a', class_='download_text', href="text/Sample-text-file-1000kb.txt")
@@ -145,7 +142,7 @@ def download_file_diff_ip(webpage, amount, path_results, path_download):
             file_name = f'{repeat}' + 'diff_ip_' + download_link['download']
             
             start_time = time.time()
-            response_file = make_tor_request(file_url, headers, proxies)
+            response_file = make_tor_request(file_url, headers, config.proxies)
             
             with open(f"{path_download}/{file_name}", 'wb') as f:
                 for chunk in response_file.iter_content(chunk_size=1024):
@@ -163,7 +160,7 @@ def download_file_diff_ip(webpage, amount, path_results, path_download):
 def download_file_same_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
-        response = requests.get(webpage, headers=headers, proxies=proxies)
+        response = requests.get(webpage, headers=headers, proxies=config.proxies)
         
         soup = bs(response.content, 'html.parser')
         download_link = soup.find('a', class_='download_text', href="text/Sample-text-file-1000kb.txt")
@@ -173,7 +170,7 @@ def download_file_same_ip(webpage, amount, path_results, path_download):
             file_name = f'{repeat}' + 'same_ip_' + download_link['download']
             
             start_time = time.time()
-            response_file = make_tor_request(file_url, headers, proxies)
+            response_file = make_tor_request(file_url, headers, config.proxies)
             
             with open(f"{path_download}/{file_name}", 'wb') as f:
                 for chunk in response_file.iter_content(chunk_size=1024):
@@ -234,9 +231,9 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
         additional_content = f"{json_data}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_same_ip.txt")
 
-def test_dns_resolution_diff_ip(domain, num_tests, path_results):
+def test_dns_resolution_diff_ip(domain, amount, path_results):
     headers = {'User-Agent': UserAgent().random}
-    for _ in range(num_tests):
+    for _ in range(amount):
         utils.change_ip()
         start_time = time.time()
         resolver = dns.resolver.Resolver()
@@ -247,9 +244,9 @@ def test_dns_resolution_diff_ip(domain, num_tests, path_results):
         additional_content = f"Answer: {answer[0].to_text()}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_diff_ip.txt")
 
-def test_dns_resolution_same_ip(domain, num_tests, path_results):
+def test_dns_resolution_same_ip(domain, amount, path_results):
     headers = {'User-Agent': UserAgent().random}
-    for _ in range(num_tests):
+    for _ in range(amount):
         start_time = time.time()
         resolver = dns.resolver.Resolver()
         resolver.nameservers = ['8.8.8.8']
@@ -275,6 +272,35 @@ def test_websocket_same_ip(uri, amount, path_results):
 
         additional_content = f"Response: {response}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_same_ip.txt")
+
+def fetch_webpage_diff_ip(webpage, amount, path_results):
+    for repeat in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        utils.change_ip()
+        
+        start_time = time.time()
+        response = requests.get(webpage, headers=headers, proxies=config.proxies)
+        end_time = time.time()
+        
+        total_time = end_time - start_time
+        additional_content = f"{response.status_code}, {webpage}\n"
+        
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_diff_ip.txt")
+
+def fetch_webpage_same_ip(webpage, amount, path_results):
+    for repeat in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        
+        start_time = time.time()
+        response = requests.get(webpage, headers=headers, proxies=config.proxies)
+        print(response.text)
+        end_time = time.time()
+        
+        total_time = end_time - start_time
+        additional_content = f"{response.status_code}, {webpage}\n"
+        
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_same_ip.txt")
+
 
 def test_requests(webpage, amount, path_results):
     make_requests_diff_ip(webpage, amount, path_results)
@@ -307,3 +333,7 @@ def test_dns_resolution(domain, num_tests, path_results):
 def test_websocket(uri, amount, path_results):
     test_websocket_diff_ip(uri, amount, path_results)
     test_websocket_same_ip(uri, amount, path_results)
+
+def test_webpage_fetch(webpage, amount, path_results):
+    fetch_webpage_diff_ip(webpage, amount, path_results)
+    fetch_webpage_same_ip(webpage, amount, path_results)

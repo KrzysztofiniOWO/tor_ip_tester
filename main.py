@@ -7,18 +7,20 @@ utils.make_directories()
 
 repeats = int(input("How many requests you want to make?: "))
 
-functions.test_requests('https://store.steampowered.com/', repeats, config.results_path)
+# functions.test_requests(*config.test_requests_params, repeats, config.results_path)
 
-functions.test_images_download_time('https://store.steampowered.com/', repeats, config.results_path, config.downloads_path)
+# functions.test_images_download_time(*config.test_images_download_time_params, repeats, config.results_path, config.downloads_path)
 
-functions.test_mongodb(repeats, config.results_path, config.db_config, config.db_query)
+# functions.test_mongodb(repeats, config.results_path, config.db_config, config.db_query)
 
-functions.test_download_file("https://sample-videos.com/download-sample-text-file.php", repeats, config.results_path, config.downloads_path)
+# functions.test_download_file(*config.test_download_file_params, repeats, config.results_path, config.downloads_path)
 
-functions.test_upload_file_ftp('eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp', repeats, f'{config.test_data_path}/sus.jpg', config.results_path)
+# functions.test_upload_file_ftp(*config.test_upload_file_ftp_params, repeats, f'{config.test_data_path}/sus.jpg', config.results_path)
 
-functions.test_json(repeats, config.results_path)
+# functions.test_json(repeats, config.results_path)
 
-functions.test_dns_resolution("example.com", repeats, config.results_path)
+# functions.test_dns_resolution(*config.test_dns_resolution_params, repeats, config.results_path)
 
-functions.test_websocket("wss://echo.websocket.org", repeats, config.results_path)
+# functions.test_websocket(config.test_websocket_params, repeats, config.results_path)
+
+functions.test_webpage_fetch(*config.test_webpage_fetch_params, repeats, config.results_path)

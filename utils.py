@@ -5,6 +5,23 @@ import requests
 from pymongo import MongoClient
 import ftplib
 import websockets
+import os
+
+def make_directories():
+    if not os.path.exists("downloads"):
+        os.makedirs("downloads")
+
+    if not os.path.exists("results"):
+        os.makedirs("results")
+
+    if not os.path.exists("statistics"):
+        os.makedirs("statistics")
+
+def get_db_password(file_path):
+    with open (file_path, 'r') as f:
+        password = f.read().strip()
+    f.close()
+    return password
 
 def change_ip():
     time.sleep(10)

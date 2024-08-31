@@ -28,7 +28,7 @@ def save_image(image_data, location):
     with open(location, 'wb') as f:
         f.write(image_data)
     
-def make_requests_diff_ip(webpage, amount, path_results):
+def make_pings_diff_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = { 'User-Agent': UserAgent().random }
         utils.change_ip()
@@ -39,7 +39,7 @@ def make_requests_diff_ip(webpage, amount, path_results):
         additional_content = f"{response.status_code}, {webpage}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/ping_results_diff_ip.txt")
 
-def make_requests_same_ip(webpage, amount, path_results):
+def make_pings_same_ip(webpage, amount, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         start_time = time.time()
@@ -192,7 +192,7 @@ def test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, 
         total_time = utils.upload_file_ftp(server, username, password, file_path)
         if total_time:
             additional_content = "\n"
-            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_diff_ip.txt")
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_results_diff_ip.txt")
 
         else:
             print("Failed to upload file")
@@ -203,7 +203,7 @@ def test_upload_file_ftp_same_ip(server, username, password, amount, file_path, 
         total_time = utils.upload_file_ftp(server, username, password, file_path)
         if total_time:
             additional_content = "\n"
-            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_same_ip.txt")
+            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_results_same_ip.txt")
 
         else:
             print("Failed to upload file")
@@ -218,7 +218,7 @@ def test_jsonplaceholder_get_diff_ip(amount, path_results):
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{json_data}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_diff_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_results_diff_ip.txt")
 
 def test_jsonplaceholder_get_same_ip(amount, path_results):
     base_url = 'https://jsonplaceholder.typicode.com'
@@ -229,7 +229,7 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{json_data}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_same_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_results_same_ip.txt")
 
 def test_dns_resolution_diff_ip(domain, amount, path_results):
     headers = {'User-Agent': UserAgent().random}
@@ -242,7 +242,7 @@ def test_dns_resolution_diff_ip(domain, amount, path_results):
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"Answer: {answer[0].to_text()}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_diff_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_results_diff_ip.txt")
 
 def test_dns_resolution_same_ip(domain, amount, path_results):
     headers = {'User-Agent': UserAgent().random}
@@ -254,7 +254,7 @@ def test_dns_resolution_same_ip(domain, amount, path_results):
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"Answer: {answer[0].to_text()}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_same_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_results_same_ip.txt")
 
 def test_websocket_diff_ip(uri, amount, path_results):
     for _ in range(amount):
@@ -285,7 +285,7 @@ def fetch_webpage_diff_ip(webpage, amount, path_results):
         total_time = end_time - start_time
         additional_content = f"{response.status_code}, {webpage}\n"
         
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_diff_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_results_diff_ip.txt")
 
 def fetch_webpage_same_ip(webpage, amount, path_results):
     for repeat in range(amount):
@@ -299,12 +299,12 @@ def fetch_webpage_same_ip(webpage, amount, path_results):
         total_time = end_time - start_time
         additional_content = f"{response.status_code}, {webpage}\n"
         
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_same_ip.txt")
+        get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_results_same_ip.txt")
 
 
 def test_requests(webpage, amount, path_results):
-    make_requests_diff_ip(webpage, amount, path_results)
-    make_requests_same_ip(webpage, amount, path_results)
+    make_pings_diff_ip(webpage, amount, path_results)
+    make_pings_same_ip(webpage, amount, path_results)
 
 def test_images_download_time(webpage, amount, path_results, path_download):
     check_first_image_download_time_diff_ip(webpage, amount, path_results, path_download)

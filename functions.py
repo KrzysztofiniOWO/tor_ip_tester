@@ -214,7 +214,7 @@ def test_jsonplaceholder_get_diff_ip(amount, path_results):
         headers = {'User-Agent': UserAgent().random}
         utils.change_ip()
         start_time = time.time()
-        json_data = utils.fetch_post(f"{base_url}/posts/1")
+        json_data = make_tor_request(f"{base_url}/posts/1", headers, config.proxies).json()
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{json_data}\n"
@@ -225,7 +225,7 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
     for _ in range(amount):
         headers = {'User-Agent': UserAgent().random}
         start_time = time.time()
-        json_data = utils.fetch_post(f"{base_url}/posts/1")
+        json_data = make_tor_request(f"{base_url}/posts/1", headers, config.proxies).json()
         end_time = time.time()
         total_time = end_time - start_time
         additional_content = f"{json_data}\n"
@@ -279,7 +279,7 @@ def fetch_webpage_diff_ip(webpage, amount, path_results):
         utils.change_ip()
         
         start_time = time.time()
-        response = requests.get(webpage, headers=headers, proxies=config.proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         end_time = time.time()
         
         total_time = end_time - start_time
@@ -292,7 +292,7 @@ def fetch_webpage_same_ip(webpage, amount, path_results):
         headers = {'User-Agent': UserAgent().random}
         
         start_time = time.time()
-        response = requests.get(webpage, headers=headers, proxies=config.proxies)
+        response = make_tor_request(webpage, headers, config.proxies)
         print(response.text)
         end_time = time.time()
         

@@ -52,7 +52,7 @@ def start_tests(repeats_entry, test_vars, progress_bar):
 
         if test_vars['dns_resolution'].get():
             functions.test_dns_resolution(*config.test_dns_resolution_params, repeats, config.results_path)
-            calculations.calculate_times("dns_resolution_name_results")
+            calculations.calculate_times("dns_resolution_name_results_")
             update_progress()
 
         if test_vars['websocket'].get():

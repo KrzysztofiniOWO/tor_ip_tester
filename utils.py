@@ -1,3 +1,5 @@
+import config
+
 import time
 from stem.control import Controller
 from stem import Signal
@@ -6,6 +8,8 @@ from pymongo import MongoClient
 import ftplib
 import websockets
 import os
+
+import config
 
 def make_directories():
     if not os.path.exists("downloads"):
@@ -16,12 +20,6 @@ def make_directories():
 
     if not os.path.exists("statistics"):
         os.makedirs("statistics")
-
-def get_db_password(file_path):
-    with open (file_path, 'r') as f:
-        password = f.read().strip()
-    f.close()
-    return password
 
 def change_ip():
     time.sleep(10)
@@ -74,3 +72,9 @@ async def websocket_test(uri):
         response = await websocket.recv()
         end_time = time.perf_counter()
         return end_time - start_time, response
+    
+def create_mongo_client():
+    uri = f"{config.db_config['uri']}&proxyHost=127.0.0.1&proxyPort=9050"
+    
+    client = MongoClient(uri, socketTimeoutMS=5000, serverSelectionTimeoutMS=5000)
+    return client

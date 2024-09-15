@@ -1,13 +1,14 @@
 import utils
 import config
-
 import time
 import requests
 from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
-import dns.resolver
-import asyncio
 from urllib.parse import urljoin
+from pymongo import MongoClient
+from urllib.parse import quote_plus
+import socks
+import socket
 
 def make_tor_request(url, headers, proxies):
     response = requests.get(url, headers=headers, proxies=proxies)
@@ -112,22 +113,6 @@ def check_first_image_download_time_same_ip(webpage, amount, path_results, path_
         else:
             print("Image could not be found")
 
-
-def test_mongodb_diff_ip(amount, path_results, db_config, query):
-    for _ in range(amount):
-        headers = {'User-Agent': UserAgent().random}
-        utils.change_ip()
-        total_time = utils.test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
-        additional_content = "\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/mongodb_results_diff_ip.txt")
-
-def test_mongodb_same_ip(amount, path_results, db_config, query):
-    for _ in range(amount):
-        headers = {'User-Agent': UserAgent().random}
-        total_time = utils.test_mongodb_query(db_config['uri'], db_config['dbname'], db_config['collection'], query)
-        additional_content = "\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/mongodb_results_same_ip.txt")
-
 def download_file_diff_ip(webpage, amount, path_results, path_download):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
@@ -185,29 +170,6 @@ def download_file_same_ip(webpage, amount, path_results, path_download):
         else:
             print("Download link not found")
 
-def test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, path_results):
-    for _ in range(amount):
-        headers = {'User-Agent': UserAgent().random}
-        utils.change_ip()
-        total_time = utils.upload_file_ftp(server, username, password, file_path)
-        if total_time:
-            additional_content = "\n"
-            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_results_diff_ip.txt")
-
-        else:
-            print("Failed to upload file")
-
-def test_upload_file_ftp_same_ip(server, username, password, amount, file_path, path_results):
-    for _ in range(amount):
-        headers = {'User-Agent': UserAgent().random}
-        total_time = utils.upload_file_ftp(server, username, password, file_path)
-        if total_time:
-            additional_content = "\n"
-            get_save_data_and_save(path_results, additional_content, headers, total_time, "/ftp_upload_results_same_ip.txt")
-
-        else:
-            print("Failed to upload file")
-
 def test_jsonplaceholder_get_diff_ip(amount, path_results):
     base_url = 'https://jsonplaceholder.typicode.com'
     for _ in range(amount):
@@ -231,48 +193,6 @@ def test_jsonplaceholder_get_same_ip(amount, path_results):
         additional_content = f"{json_data}\n"
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/jsonplaceholder_get_results_same_ip.txt")
 
-def test_dns_resolution_diff_ip(domain, amount, path_results):
-    headers = {'User-Agent': UserAgent().random}
-    for _ in range(amount):
-        utils.change_ip()
-        start_time = time.time()
-        resolver = dns.resolver.Resolver()
-        resolver.nameservers = ['8.8.8.8']
-        answer = resolver.query(domain)
-        end_time = time.time()
-        total_time = end_time - start_time
-        additional_content = f"Answer: {answer[0].to_text()}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_results_diff_ip.txt")
-
-def test_dns_resolution_same_ip(domain, amount, path_results):
-    headers = {'User-Agent': UserAgent().random}
-    for _ in range(amount):
-        start_time = time.time()
-        resolver = dns.resolver.Resolver()
-        resolver.nameservers = ['8.8.8.8']
-        answer = resolver.query(domain)
-        end_time = time.time()
-        total_time = end_time - start_time
-        additional_content = f"Answer: {answer[0].to_text()}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/dns_resolution_name_results_same_ip.txt")
-
-def test_websocket_diff_ip(uri, amount, path_results):
-    for _ in range(amount):
-        utils.change_ip()
-        headers = {'User-Agent': UserAgent().random}
-        total_time, response = asyncio.run(utils.websocket_test(uri))
-
-        additional_content = f"Response: {response}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_diff_ip.txt")
-
-def test_websocket_same_ip(uri, amount, path_results):
-    headers = {'User-Agent': UserAgent().random}
-    for _ in range(amount):
-        total_time, response = asyncio.run(utils.websocket_test(uri))
-
-        additional_content = f"Response: {response}\n"
-        get_save_data_and_save(path_results, additional_content, headers, total_time, "/websocket_results_same_ip.txt")
-
 def fetch_webpage_diff_ip(webpage, amount, path_results):
     for repeat in range(amount):
         headers = {'User-Agent': UserAgent().random}
@@ -293,7 +213,6 @@ def fetch_webpage_same_ip(webpage, amount, path_results):
         
         start_time = time.time()
         response = make_tor_request(webpage, headers, config.proxies)
-        print(response.text)
         end_time = time.time()
         
         total_time = end_time - start_time
@@ -301,6 +220,37 @@ def fetch_webpage_same_ip(webpage, amount, path_results):
         
         get_save_data_and_save(path_results, additional_content, headers, total_time, "/webpage_fetch_results_same_ip.txt")
 
+def test_mongodb_find_diff_ip(amount, path_results):
+    for _ in range(amount):
+        utils.change_ip()
+
+        client = utils.create_mongo_client()
+        db = client[config.db_config['dbname']]
+        collection = db[config.db_config['collection']]
+
+        start_time = time.time()
+        results = collection.find({"property_type": "house"})
+        list(results)
+        end_time = time.time()
+
+        total_time = end_time - start_time
+        additional_content = f"\n"
+        get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/mongodb_find_results_diff_ip.txt")
+
+def test_mongodb_find_same_ip(amount, path_results):
+    client = utils.create_mongo_client()
+    db = client[config.db_config['dbname']]
+    collection = db[config.db_config['collection']]
+
+    for _ in range(amount):
+        start_time = time.time()
+        results = collection.find({"property_type": "house"})
+        list(results)
+        end_time = time.time()
+
+        total_time = end_time - start_time
+        additional_content = f"\n"
+        get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/mongodb_find_results_same_ip.txt")
 
 def test_requests(webpage, amount, path_results):
     make_pings_diff_ip(webpage, amount, path_results)
@@ -310,30 +260,19 @@ def test_images_download_time(webpage, amount, path_results, path_download):
     check_first_image_download_time_diff_ip(webpage, amount, path_results, path_download)
     check_first_image_download_time_same_ip(webpage, amount, path_results, path_download)
 
-def test_mongodb(amount, path_results, db_config, query):
-    test_mongodb_diff_ip(amount, path_results, db_config, query)
-    test_mongodb_same_ip(amount, path_results, db_config, query)
-
 def test_download_file(webpage, amount, path_results, path_download):
     download_file_diff_ip(webpage, amount, path_results, path_download)
     download_file_same_ip(webpage, amount, path_results, path_download)
-
-def test_upload_file_ftp(server, username, password, amount, file_path, path_results):
-    test_upload_file_ftp_diff_ip(server, username, password, amount, file_path, path_results)
-    test_upload_file_ftp_same_ip(server, username, password, amount, file_path, path_results)
 
 def test_json(amount, path_results):
     test_jsonplaceholder_get_diff_ip(amount, path_results)
     test_jsonplaceholder_get_same_ip(amount, path_results)
 
-def test_dns_resolution(domain, num_tests, path_results):
-    test_dns_resolution_diff_ip(domain, num_tests, path_results)
-    test_dns_resolution_same_ip(domain, num_tests, path_results)
-
-def test_websocket(uri, amount, path_results):
-    test_websocket_diff_ip(uri, amount, path_results)
-    test_websocket_same_ip(uri, amount, path_results)
-
 def test_webpage_fetch(webpage, amount, path_results):
     fetch_webpage_diff_ip(webpage, amount, path_results)
     fetch_webpage_same_ip(webpage, amount, path_results)
+
+def test_mongodb_querry(amount, path_results):
+    test_mongodb_find_diff_ip(amount, path_results)
+    test_mongodb_find_same_ip(amount, path_results)
+

@@ -38,6 +38,12 @@ def test_mongodb_query(uri, dbname, collection_name, query):
     client.close()
     return total_time
 
+def create_mongo_client():
+    uri = f"{config.db_config['uri']}&proxyHost=127.0.0.1&proxyPort=9050"
+    
+    client = MongoClient(uri, socketTimeoutMS=5000, serverSelectionTimeoutMS=5000)
+    return client
+
 def upload_file_ftp(server, username, password, file_path):
     try:
         ftp = ftplib.FTP(server)
@@ -72,9 +78,3 @@ async def websocket_test(uri):
         response = await websocket.recv()
         end_time = time.perf_counter()
         return end_time - start_time, response
-    
-def create_mongo_client():
-    uri = f"{config.db_config['uri']}&proxyHost=127.0.0.1&proxyPort=9050"
-    
-    client = MongoClient(uri, socketTimeoutMS=5000, serverSelectionTimeoutMS=5000)
-    return client

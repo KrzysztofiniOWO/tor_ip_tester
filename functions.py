@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
 from urllib.parse import urljoin
+from urllib.parse import urlparse
 from pymongo import MongoClient
 from urllib.parse import quote_plus
 import socks
@@ -252,6 +253,39 @@ def test_mongodb_find_same_ip(amount, path_results):
         additional_content = f"\n"
         get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/mongodb_find_results_same_ip.txt")
 
+def test_dns_resolution_diff_ip(hostname, amount, path_results):
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        utils.change_ip()
+        start_time = time.time()
+        
+        url = f"http://{hostname}"
+
+        response = make_tor_request(url, headers, config.proxies)
+
+        additional_content = "\n"
+        end_time = time.time()
+        total_time = end_time - start_time
+        
+        get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/dns_resolution_results_diff_ip.txt")
+
+def test_dns_resolution_same_ip(hostname, amount, path_results):
+    for _ in range(amount):
+        headers = {'User-Agent': UserAgent().random}
+        start_time = time.time()
+        
+        url = f"http://{hostname}"
+
+        response = make_tor_request(url, headers, config.proxies)
+
+        additional_content = "\n"
+        end_time = time.time()
+        total_time = end_time - start_time
+        
+        get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/dns_resolution_results_same_ip.txt")
+
+
+
 def test_requests(webpage, amount, path_results):
     make_pings_diff_ip(webpage, amount, path_results)
     make_pings_same_ip(webpage, amount, path_results)
@@ -275,4 +309,8 @@ def test_webpage_fetch(webpage, amount, path_results):
 def test_mongodb_querry(amount, path_results):
     test_mongodb_find_diff_ip(amount, path_results)
     test_mongodb_find_same_ip(amount, path_results)
+
+def test_dns_resolution(hostname, amount, path_results):
+    test_dns_resolution_diff_ip(hostname, amount, path_results)
+    test_dns_resolution_same_ip(hostname, amount, path_results)
 

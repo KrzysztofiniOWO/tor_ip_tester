@@ -50,11 +50,15 @@ def start_tests(repeats_entry, test_vars, progress_bar):
             calculations.calculate_times("mongodb_find_results_")
             update_progress()
 
+        if test_vars['dns_resolution'].get():
+            functions.test_dns_resolution(*config.test_dns_params, repeats, config.results_path)
+            calculations.calculate_times("dns_resolution_results_")
+            update_progress()
+
         messagebox.showinfo("Success", "Tests completed!")
 
     except ValueError:
         messagebox.showerror("Input Error", "Please enter a valid number for repeats.")
-
 
 def create_ui():
     global root
@@ -83,7 +87,8 @@ def create_ui():
         'download_file': tk.BooleanVar(),
         'json': tk.BooleanVar(),
         'webpage_fetch': tk.BooleanVar(),
-        'mongodb': tk.BooleanVar()
+        'mongodb': tk.BooleanVar(),
+        'dns_resolution': tk.BooleanVar()
     }
 
     ttk.Checkbutton(root, text="Test Requests", variable=test_vars['requests']).grid(column=0, row=1, sticky=tk.W)
@@ -92,6 +97,7 @@ def create_ui():
     ttk.Checkbutton(root, text="Test JSON", variable=test_vars['json']).grid(column=0, row=4, sticky=tk.W)
     ttk.Checkbutton(root, text="Test Webpage Fetch", variable=test_vars['webpage_fetch']).grid(column=0, row=5, sticky=tk.W)
     ttk.Checkbutton(root, text="Test MongoDB", variable=test_vars['mongodb']).grid(column=0, row=6, sticky=tk.W)
+    ttk.Checkbutton(root, text="Test DNS Resolution", variable=test_vars['dns_resolution']).grid(column=0, row=7, sticky=tk.W)
 
     progress_bar = ttk.Progressbar(root, orient='horizontal', mode='determinate', length=260, style="TProgressbar")
     progress_bar.grid(column=0, row=10, columnspan=2, pady=12)

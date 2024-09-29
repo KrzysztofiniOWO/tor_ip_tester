@@ -16,21 +16,29 @@
  
  This file contains the functions necessary to conduct research for dynamically assigned and static ip addresses. The functions that test the various services are:  
 
-  - **make_requests -** Tests pinging websites
-  
-  - **check_first_image_download_time -** Checks the time it takes to find and download the first image file on the page
+- **make_pings -**
+Pings a webpage and records response times.
 
-  - **test_mongodb -** Checks the time it takes to connect to the mongodb database and execute the query
+- **check_first_image_download_time -**
+Downloads the first image from a webpage and records download times.
 
-  - **download_file -** Checks the time it takes to download a test text file
-  
-  - **test_upload_file_ftp -** Checks the time it takes to transfer an image file via ftp
-  
-  - **test_jsonplaceholder_get -** Test the response time and data fetching from the jsonplaceholder API
-  
-  - **test_dns_resolution -** Test the DNS resolution time for a given domain
-  
-  - **test_websocket -** Test WebSocket connections
+- **download_file -**
+Downloads a sample text file from a webpage and records download times.
+
+- **test_jsonplaceholder_get -**
+Sends GET requests to the JSONPlaceholder API and records response times.
+
+- **fetch_webpage -**
+Fetches a webpage and records response times.
+
+- **test_mongodb_find -**
+Queries MongoDB and records query times.
+
+- **test_dns_resolution -**
+Resolves DNS for a hostname and records resolution times.
+
+- **test_websocket_connection -**
+Establishes WebSocket connections and records connection times.
   
 ### statistics.py
 
@@ -39,6 +47,10 @@ This file is used to create statistics based on the generated data
 ### utils.py
 
 This file contains auxiliary functions used when running tests
+
+### config.py
+
+This file contains config parameters for functions used when running tests
 
 
   

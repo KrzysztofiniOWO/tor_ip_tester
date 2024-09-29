@@ -5,11 +5,7 @@ import requests
 from bs4 import BeautifulSoup as bs
 from fake_useragent import UserAgent
 from urllib.parse import urljoin
-from urllib.parse import urlparse
-from pymongo import MongoClient
-from urllib.parse import quote_plus
-import socks
-import socket
+import websocket
 
 def make_tor_request(url, headers, proxies):
     response = requests.get(url, headers=headers, proxies=proxies)
@@ -284,7 +280,44 @@ def test_dns_resolution_same_ip(hostname, amount, path_results):
         
         get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/dns_resolution_results_same_ip.txt")
 
+def test_websocket_connection_diff_ip(url, amount, path_results):
+    for _ in range(amount):
+        utils.change_ip()
+        start_time = time.time()
+        
+        try:
+            ws = websocket.WebSocket()
+            ws.connect(url, http_proxy_host="127.0.0.1", http_proxy_port=9050, proxy_type="socks5")
 
+            end_time = time.time()
+            total_time = end_time - start_time
+            ws.close()
+            
+            additional_content = f"Connected to {url}\n"
+            get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/websocket_results_diff_ip.txt")
+        
+        except Exception as e:
+            print(f"Error during WebSocket connection: {e}")
+            total_time = None
+
+def test_websocket_connection_same_ip(url, amount, path_results):
+    for _ in range(amount):
+        start_time = time.time()
+        
+        try:
+            ws = websocket.WebSocket()
+            ws.connect(url, http_proxy_host="127.0.0.1", http_proxy_port=9050, proxy_type="socks5")
+            
+            end_time = time.time()
+            total_time = end_time - start_time
+            ws.close()
+            
+            additional_content = f"Connected to {url}\n"
+            get_save_data_and_save(path_results, additional_content, headers=None, total_time=total_time, filename="/websocket_results_same_ip.txt")
+        
+        except Exception as e:
+            print(f"Error during WebSocket connection: {e}")
+            total_time = None
 
 def test_requests(webpage, amount, path_results):
     make_pings_diff_ip(webpage, amount, path_results)
@@ -313,4 +346,8 @@ def test_mongodb_querry(amount, path_results):
 def test_dns_resolution(hostname, amount, path_results):
     test_dns_resolution_diff_ip(hostname, amount, path_results)
     test_dns_resolution_same_ip(hostname, amount, path_results)
+
+def test_websocket_connection(url, amount, path_results):
+    test_websocket_connection_diff_ip(url, amount, path_results)
+    test_websocket_connection_same_ip(url, amount, path_results)
 

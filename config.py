@@ -31,3 +31,4 @@ test_upload_file_ftp_params = ['eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e
 test_webpage_fetch_params = ["https://psiaki.fandom.com/pl/wiki/Pies_domowy"]
 test_post_form_params = ["http://httpbin.org/forms/post"]
 test_dns_params = ["google.com"]
+test_websocket_params = ["wss://echo.websocket.events"]

@@ -55,6 +55,11 @@ def start_tests(repeats_entry, test_vars, progress_bar):
             calculations.calculate_times("dns_resolution_results_")
             update_progress()
 
+        if test_vars['websocket_connection'].get():
+            functions.test_websocket_connection(*config.test_websocket_params, repeats, config.results_path)
+            calculations.calculate_times("websocket_results_")
+            update_progress()
+
         messagebox.showinfo("Success", "Tests completed!")
 
     except ValueError:
@@ -88,7 +93,8 @@ def create_ui():
         'json': tk.BooleanVar(),
         'webpage_fetch': tk.BooleanVar(),
         'mongodb': tk.BooleanVar(),
-        'dns_resolution': tk.BooleanVar()
+        'dns_resolution': tk.BooleanVar(),
+        'websocket_connection': tk.BooleanVar(),
     }
 
     ttk.Checkbutton(root, text="Test Requests", variable=test_vars['requests']).grid(column=0, row=1, sticky=tk.W)
@@ -98,6 +104,7 @@ def create_ui():
     ttk.Checkbutton(root, text="Test Webpage Fetch", variable=test_vars['webpage_fetch']).grid(column=0, row=5, sticky=tk.W)
     ttk.Checkbutton(root, text="Test MongoDB", variable=test_vars['mongodb']).grid(column=0, row=6, sticky=tk.W)
     ttk.Checkbutton(root, text="Test DNS Resolution", variable=test_vars['dns_resolution']).grid(column=0, row=7, sticky=tk.W)
+    ttk.Checkbutton(root, text="Test WebSocket Connection", variable=test_vars['websocket_connection']).grid(column=0, row=8, sticky=tk.W)
 
     progress_bar = ttk.Progressbar(root, orient='horizontal', mode='determinate', length=260, style="TProgressbar")
     progress_bar.grid(column=0, row=10, columnspan=2, pady=12)

@@ -22,27 +22,26 @@ def calculate_times(file_name):
     fsr.close()
 
     time_mean_diff_ip = sum(time_values_diff_ip) / len(time_values_diff_ip)
-    time_median_diff_ip = np.median(time_values_diff_ip)
+    time_std_diff_ip = np.std(time_values_diff_ip)
     time_min_diff_ip = min(time_values_diff_ip)
     time_max_diff_ip = max(time_values_diff_ip)
 
     time_mean_same_ip = sum(time_values_same_ip) / len(time_values_same_ip)
-    time_median_same_ip = np.median(time_values_same_ip)
+    time_std_same_ip = np.std(time_values_same_ip)
     time_min_same_ip = min(time_values_same_ip)
     time_max_same_ip = max(time_values_same_ip)
 
-    with open(f'statistics/statistics_{file_name}.txt', 'w')as fw:
-        fw.write("Statictics for difefrent ip addresses: \n")
-        fw.write(f"Mean of times: {time_mean_diff_ip}\n")
-        fw.write(f"Median of times: {time_median_diff_ip}\n")
-        fw.write(f"Min of times: {time_min_diff_ip}\n")
-        fw.write(f"Max of times: {time_max_diff_ip}\n")
+    with open(f'statistics/statistics_{file_name}.txt', 'w') as fw:
+        fw.write("Statystyki dla różnych adresów IP: \n")
+        fw.write(f"Średnia czasu: {time_mean_diff_ip}\n")
+        fw.write(f"Odchylenie standardowe czasu: {time_std_diff_ip}\n")
+        fw.write(f"Minimalny czas: {time_min_diff_ip}\n")
+        fw.write(f"Maksymalny czas: {time_max_diff_ip}\n")
         fw.write("\n")
 
-        fw.write("Statictics for same ip addresses: \n")
-        fw.write(f"Mean of times: {time_mean_same_ip}\n")
-        fw.write(f"Median of times: {time_median_same_ip}\n")
-        fw.write(f"Min of times: {time_min_same_ip}\n")
-        fw.write(f"Max of times: {time_max_same_ip}\n")
+        fw.write("Statystyki dla tego samego adresu IP: \n")
+        fw.write(f"Średnia czasu: {time_mean_same_ip}\n")
+        fw.write(f"Odchylenie standardowe czasu: {time_std_same_ip}\n")
+        fw.write(f"Minimalny czas: {time_min_same_ip}\n")
+        fw.write(f"Maksymalny czas: {time_max_same_ip}\n")
     fw.close()
-

@@ -117,11 +117,11 @@ def download_file_diff_ip(webpage, amount, path_results, path_download):
         response = requests.get(webpage, headers=headers, proxies=config.proxies)
         
         soup = bs(response.content, 'html.parser')
-        download_link = soup.find('a', class_='download_text', href="text/Sample-text-file-1000kb.txt")
+        download_link = soup.find('a', class_='text-sm pt-2 pb-2 pr-4 pl-4 rounded bg-gray-700 hover:bg-gray-800 text-white md:w-full md:text-center', href=True)
         
         if download_link:
-            file_url = f"https://sample-videos.com/{download_link['href']}"
-            file_name = f'{repeat}' + 'diff_ip_' + download_link['download']
+            file_url = f"https://filesampleshub.com{download_link['href']}"
+            file_name = f'{repeat}' + '_diff_ip_' + download_link['href'].split('/')[-1]
             
             start_time = time.time()
             response_file = make_tor_request(file_url, headers, config.proxies)
@@ -145,11 +145,11 @@ def download_file_same_ip(webpage, amount, path_results, path_download):
         response = requests.get(webpage, headers=headers, proxies=config.proxies)
         
         soup = bs(response.content, 'html.parser')
-        download_link = soup.find('a', class_='download_text', href="text/Sample-text-file-1000kb.txt")
+        download_link = soup.find('a', class_='text-sm pt-2 pb-2 pr-4 pl-4 rounded bg-gray-700 hover:bg-gray-800 text-white md:w-full md:text-center', href=True)
         
         if download_link:
-            file_url = f"https://sample-videos.com/{download_link['href']}"
-            file_name = f'{repeat}' + 'same_ip_' + download_link['download']
+            file_url = f"https://filesampleshub.com{download_link['href']}"
+            file_name = f'{repeat}' + '_same_ip_' + download_link['href'].split('/')[-1]
             
             start_time = time.time()
             response_file = make_tor_request(file_url, headers, config.proxies)

@@ -24,11 +24,11 @@ proxies = {
     'https': 'socks5h://127.0.0.1:9050'
 }
 
-test_requests_params = ['https://store.steampowered.com/']
-test_images_download_time_params = ['https://store.steampowered.com/']
-test_download_file_params = ["https://sample-videos.com/download-sample-text-file.php"]
+test_requests_params = ["http://httpbin.org/forms/post"]
+test_images_download_time_params = ['https://www.nytimes.com']
+test_download_file_params = ["https://filesampleshub.com/format/document/txt"]
 test_upload_file_ftp_params = ['eu-west-1.sftpcloud.io', 'f831873852d84bb6b0c82e0f6549fd1b', 'vzy3qOglaqIZsmhzFrHtjAhIUevaKGDp']
-test_webpage_fetch_params = ["https://psiaki.fandom.com/pl/wiki/Pies_domowy"]
+test_webpage_fetch_params = ["https://www.nytimes.com"]
 test_post_form_params = ["http://httpbin.org/forms/post"]
 test_dns_params = ["google.com"]
 test_websocket_params = ["wss://echo.websocket.events"]

@@ -6,64 +6,60 @@ import calculations
 import config
 
 def start_tests(repeats_entry, test_vars, progress_bar):
-    try:
-        repeats = int(repeats_entry.get())
+    repeats = int(repeats_entry.get())
 
-        selected_tests = [key for key, var in test_vars.items() if var.get()]
-        total_tests = len(selected_tests)
-        completed_tests = 0
+    selected_tests = [key for key, var in test_vars.items() if var.get()]
+    total_tests = len(selected_tests)
+    completed_tests = 0
 
-        def update_progress():
-            nonlocal completed_tests
-            completed_tests += 1
-            progress = (completed_tests / total_tests) * 100
-            progress_bar['value'] = progress
-            root.update_idletasks()
+    def update_progress():
+        nonlocal completed_tests
+        completed_tests += 1
+        progress = (completed_tests / total_tests) * 100
+        progress_bar['value'] = progress
+        root.update_idletasks()
 
-        if test_vars['requests'].get():
-            functions.test_requests(*config.test_requests_params, repeats, config.results_path)
-            calculations.calculate_times("ping_results_")
-            update_progress()
-            
-        if test_vars['images_download_time'].get():
-            functions.test_images_download_time(*config.test_images_download_time_params, repeats, config.results_path, config.downloads_path)
-            calculations.calculate_times("image_dl_results_")
-            update_progress()
+    if test_vars['requests'].get():
+        functions.test_requests(*config.test_requests_params, repeats, config.results_path)
+        calculations.calculate_times("ping_results_")
+        update_progress()
         
-        if test_vars['download_file'].get():
-            functions.test_download_file(*config.test_download_file_params, repeats, config.results_path, config.downloads_path)
-            calculations.calculate_times("file_dl_results_")
-            update_progress()
+    if test_vars['images_download_time'].get():
+        functions.test_images_download_time(*config.test_images_download_time_params, repeats, config.results_path, config.downloads_path)
+        calculations.calculate_times("image_dl_results_")
+        update_progress()
+    
+    if test_vars['download_file'].get():
+        functions.test_download_file(*config.test_download_file_params, repeats, config.results_path, config.downloads_path)
+        calculations.calculate_times("file_dl_results_")
+        update_progress()
 
-        if test_vars['json'].get():
-            functions.test_json(repeats, config.results_path)
-            calculations.calculate_times("jsonplaceholder_get_results_")
-            update_progress()
+    if test_vars['json'].get():
+        functions.test_json(repeats, config.results_path)
+        calculations.calculate_times("jsonplaceholder_get_results_")
+        update_progress()
 
-        if test_vars['webpage_fetch'].get():
-            functions.test_webpage_fetch(*config.test_webpage_fetch_params, repeats, config.results_path)
-            calculations.calculate_times("webpage_fetch_results_")
-            update_progress()
+    if test_vars['webpage_fetch'].get():
+        functions.test_webpage_fetch(*config.test_webpage_fetch_params, repeats, config.results_path)
+        calculations.calculate_times("webpage_fetch_results_")
+        update_progress()
 
-        if test_vars['mongodb'].get():
-            functions.test_mongodb_querry(repeats, config.results_path)
-            calculations.calculate_times("mongodb_find_results_")
-            update_progress()
+    if test_vars['mongodb'].get():
+        functions.test_mongodb_querry(repeats, config.results_path)
+        calculations.calculate_times("mongodb_find_results_")
+        update_progress()
 
-        if test_vars['dns_resolution'].get():
-            functions.test_dns_resolution(*config.test_dns_params, repeats, config.results_path)
-            calculations.calculate_times("dns_resolution_results_")
-            update_progress()
+    if test_vars['dns_resolution'].get():
+        functions.test_dns_resolution(*config.test_dns_params, repeats, config.results_path)
+        calculations.calculate_times("dns_resolution_results_")
+        update_progress()
 
-        if test_vars['websocket_connection'].get():
-            functions.test_websocket_connection(*config.test_websocket_params, repeats, config.results_path)
-            calculations.calculate_times("websocket_results_")
-            update_progress()
+    if test_vars['websocket_connection'].get():
+        functions.test_websocket_connection(*config.test_websocket_params, repeats, config.results_path)
+        calculations.calculate_times("websocket_results_")
+        update_progress()
 
-        messagebox.showinfo("Success", "Tests completed!")
-
-    except ValueError:
-        messagebox.showerror("Input Error", "Please enter a valid number for repeats.")
+    messagebox.showinfo("Success", "Tests completed!")
 
 def create_ui():
     global root
